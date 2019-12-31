@@ -1,3 +1,2 @@
-1. do socket generation
-2. socket continous sending stuff
-3. tor implementation
+1. socks implementation
+2. tor implementation
