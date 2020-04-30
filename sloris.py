@@ -14,10 +14,10 @@ argparser.add_argument("domain", nargs="?", type=str, help="Host to test")
 argparser.add_argument("-p", "--port", type=int, default=8080, help="Port")
 
 #time to keep connection alive, default is 4 seconds
-argparser.add_argument("-a", "--alivetime", type=int, default=4, help="Keep Alive Time")
+argparser.add_argument("-a", "--alivetime", type=int, default=12, help="Keep Alive Time")
 
 #sleep time, default is 1 second
-argparser.add_argument("-t", "--sleeptime", type=int, default=1, help="Time to sleep")
+argparser.add_argument("-t", "--sleeptime", type=int, default=10, help="Time to sleep")
 
 #number of sockets, default is 200
 argparser.add_argument("-s", "--socket", type=int, default=200, help="# of sockets")
